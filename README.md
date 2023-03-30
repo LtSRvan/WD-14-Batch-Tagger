@@ -1,5 +1,6 @@
 # WD-14-Batch-Tagger
-This repository is a batch tagger adapted from the hugginface space that works on the swinv2 model by SmilingWolf. It will generate a txt file with the same name of the image with the prediction results inside
+This repository is a batch tagger adapted from the hugginface space that works on the swinv2 model by SmilingWolf. It will generate a txt file with the same name of the image with the prediction results inside.
+
 It can be run on both GPU and CPU, instructions for each one below.
 
 ## Installation
