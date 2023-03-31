@@ -1,18 +1,22 @@
 import os
+import re
 import numpy as np
 import onnxruntime as rt
 import pandas as pd
 import PIL.Image
 import cv2
 import argparse
+import urllib.request
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--input", type=str, required=True, help="Folder of images")
-parser.add_argument("--output", type=str, required=True, help="Output folder")
-parser.add_argument("--label", type=str, required=False, default="selected_tags.csv", help="By default assumes that 'selected_tags.csv' is on the same directory.")
-parser.add_argument("--model", type=str, required=False, default="model.onnx", help="By default assumes that the 'model.onnx' is on the same directory.")
-parser.add_argument("--general_score", type=float, required=False, default="0.5", help="Sets the minimum score of 'confidence'. Default '0.5'")
-parser.add_argument("--character_score", type=float, required=False, default="0.85", help="Sets the minimum score of 'character confidence'. Default '0.85'")
+parser.add_argument("--input", type=str, default="./Test", help="Folder of images. By default will be using the Test folder")
+parser.add_argument("--output", type=str, help="Output folder. By default same as the input")
+parser.add_argument("--label", type=str, default="selected_tags.csv", help="By default assumes that 'selected_tags.csv' is on the same directory.")
+parser.add_argument("--model", type=str, default="model.onnx", help="By default assumes that the 'model.onnx' is on the same directory.")
+parser.add_argument("--general_score", type=float, default="0.5", help="Sets the minimum score of 'confidence'. Default '0.5'")
+parser.add_argument("--character_score", type=float, default="0.85", help="Sets the minimum score of 'character confidence'. Default '0.85'")
+parser.add_argument("--gpu", action='store_true', help="Use GPU for prediction if available. Faster and useful for large datasets")
+parser.add_argument('--add_keyword', type=str, default='', help='keyword to add to output')
 args = parser.parse_args()
 
 MODEL_FILENAME = args.model
@@ -21,9 +25,40 @@ IMAGES_DIRECTORY = args.input
 OUTPUT_DIRECTORY = args.output
 SCORE_GENERAL_THRESHOLD = args.general_score
 SCORE_CHARACTER_THRESHOLD = args.character_score
+USE_GPU = args.gpu
 
-def load_model(model_filename: str) -> rt.InferenceSession:
-    model = rt.InferenceSession(model_filename)
+if args.output is None:
+    OUTPUT_DIRECTORY = IMAGES_DIRECTORY
+else:
+    OUTPUT_DIRECTORY = args.output
+
+def download_file(url: str, filename: str):
+    urllib.request.urlretrieve(url, filename)
+
+def download_files():
+    MODEL_URL = "https://huggingface.co/SmilingWolf/wd-v1-4-swinv2-tagger-v2/resolve/main/model.onnx"
+    LABEL_URL = "https://huggingface.co/SmilingWolf/wd-v1-4-swinv2-tagger-v2/resolve/main/selected_tags.csv"
+    
+    if not os.path.exists(MODEL_FILENAME):
+        print(f"Downloading {MODEL_FILENAME}...")
+        download_file(MODEL_URL, MODEL_FILENAME)
+    
+    if not os.path.exists(LABEL_FILENAME):
+        print(f"Downloading {LABEL_FILENAME}...")
+        download_file(LABEL_URL, LABEL_FILENAME)
+
+def load_model(model_filename: str, use_gpu: bool) -> rt.InferenceSession:
+    sess_options = rt.SessionOptions()
+    sess_options.execution_mode = rt.ExecutionMode.ORT_SEQUENTIAL
+    sess_options.graph_optimization_level = rt.GraphOptimizationLevel.ORT_ENABLE_ALL
+    sess_options.log_severity_level = 3
+    
+    if use_gpu and 'CUDAExecutionProvider' in rt.get_available_providers():
+        providers = ['CUDAExecutionProvider', 'CPUExecutionProvider']
+    else:
+        providers = ['CPUExecutionProvider']
+
+    model = rt.InferenceSession(model_filename, sess_options, providers=providers)
     return model
 
 def load_labels() -> list[str]:
@@ -78,11 +113,18 @@ def predict(
         .replace(")", "\)")
     )
     c = ", ".join(list(b.keys()))
-
-    return f"{a}\n"
+    character_tags = ', '.join(list(character_res.keys())).replace('_', ' ')
+    character_tags = re.sub(r'\([^)]*\)', '', character_tags)
+    result = f"{character_tags}, {a}"
+    result = re.sub(r'\s*,\s*', ', ', result)
+    
+    if args.add_keyword:
+        return f"{args.add_keyword}, {a}"
+    else:
+        return result
 
 def main():
-    model = load_model(MODEL_FILENAME)
+    model = load_model(MODEL_FILENAME, USE_GPU)
     tag_names, rating_indexes, general_indexes, character_indexes = load_labels()
 
     if not os.path.exists(OUTPUT_DIRECTORY):
@@ -114,4 +156,5 @@ def main():
             f.write(str(result))
 
 if __name__ == "__main__":
+    download_files()
     main()
