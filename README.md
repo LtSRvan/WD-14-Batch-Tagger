@@ -4,7 +4,7 @@ This repository is a batch tagger adapted from the hugginface space that works o
 It can be run on both GPU and CPU, instructions for each one below.
 
 ## Installation
-To start usign clone the repository:
+To start using clone the repository:
 
     git clone https://github.com/LtSRvan/WD-14-Batch-Tagger
 
