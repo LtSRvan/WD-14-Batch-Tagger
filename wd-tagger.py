@@ -12,7 +12,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--input", type=str, default="./Test", help="Folder of images. By default will be using the Test folder")
 parser.add_argument("--output", type=str, help="Output folder. By default same as the input")
 parser.add_argument("--label", type=str, default="./Models/selected_tags.csv", help="By default assumes that 'selected_tags.csv' is on the same directory.")
-parser.add_argument("--model", type=str, default="Swinv2", help="By default assumes that the 'model.onnx' is on the same directory. Options: 'convnextv2', 'convnext_tagger_v2', 'swinv2', 'ViTv2'")
+parser.add_argument("--model", type=str, default="Swinv2", help="Options: 'Convnextv2', 'Convnext_tagger_v2', 'Swinv2', 'ViTv2', if you dont have any model downloaded select one and it will be downloaded automatically")
 parser.add_argument("--general_score", type=float, default="0.5", help="Sets the minimum score of 'confidence'. Default '0.5'")
 parser.add_argument("--character_score", type=float, default="0.85", help="Sets the minimum score of 'character confidence'. Default '0.85'")
 parser.add_argument("--gpu", action='store_true', help="Use GPU for prediction if available. Faster and useful for large datasets")
@@ -39,9 +39,9 @@ def download_file(url: str, filename: str):
 
 def download_files():
     model_urls = {
-        "convnextv2": "https://huggingface.co/SmilingWolf/wd-v1-4-convnextv2-tagger-v2/resolve/main/model.onnx",
-        "convnext_tagger_v2": "https://huggingface.co/SmilingWolf/wd-v1-4-convnext-tagger-v2/resolve/main/model.onnx",
-        "swinv2": "https://huggingface.co/SmilingWolf/wd-v1-4-swinv2-tagger-v2/resolve/main/model.onnx",
+        "Convnextv2": "https://huggingface.co/SmilingWolf/wd-v1-4-convnextv2-tagger-v2/resolve/main/model.onnx",
+        "Convnext_tagger_v2": "https://huggingface.co/SmilingWolf/wd-v1-4-convnext-tagger-v2/resolve/main/model.onnx",
+        "Swinv2": "https://huggingface.co/SmilingWolf/wd-v1-4-swinv2-tagger-v2/resolve/main/model.onnx",
         "ViTv2": "https://huggingface.co/SmilingWolf/wd-v1-4-vit-tagger-v2/resolve/main/model.onnx",
     }
     LABEL_URL = "https://huggingface.co/SmilingWolf/wd-v1-4-swinv2-tagger-v2/resolve/main/selected_tags.csv"
