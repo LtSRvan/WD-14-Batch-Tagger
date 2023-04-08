@@ -1,5 +1,5 @@
 # WD-14-Batch-Tagger
-This repository is a batch tagger adapted from the hugginface space that works on the swinv2 model by SmilingWolf. It will generate a txt file with the same name of the image with the prediction results inside.
+This repository is a batch tagger adapted from the hugginface space that works on the swinv2 model by SmilingWolf wu¿ith support for **Convnextv2**, **Convnext_tagger_v2**, **Swinv2** and **ViTv2**. It will generate a txt file with the same name of the image with the prediction results inside.
 
 It can be run on both GPU and CPU, instructions for each one below.
 
@@ -20,7 +20,7 @@ Once it's done install the **requirements.txt**:
 
     pip install -r requirements.txt
 
-You can dowload the [model.onnx](https://huggingface.co/SmilingWolf/wd-v1-4-swinv2-tagger-v2/resolve/main/model.onnx) and the [selected_tags.csv](https://huggingface.co/SmilingWolf/wd-v1-4-swinv2-tagger-v2/resolve/main/selected_tags.csv) and put both on the WD-14-Batch-Tagger folder. If you download the models but don't put them in the same directory as the script, specify the path (instructions below) otherwise the script will download the missing resources
+You can dowload the [Models](https://huggingface.co/SmilingWolf) and the [selected_tags.csv](https://huggingface.co/SmilingWolf/wd-v1-4-swinv2-tagger-v2/resolve/main/selected_tags.csv) and put both on the './Models' folder. If you download the models but don't put them in the folder, specify the path (instructions below) otherwise the script will download the missing resources
 
 ## Usage
 
@@ -42,7 +42,7 @@ Specify the directory where the results are going to be stored. Default will be 
 By default, it assumes that 'selected_tags.csv' is in the same folder as the script. If it has a different name or is on another directory use this argument to specify.
 
 ### --model
-Same as '--label', by default, it assumes that 'model.onnx' is in the same folder as the script. If it has a different name or is on another directory use this argument to specify.
+As mentioned at the beginning you can chose from 'Convnextv2', 'Convnext_tagger_v2', 'Swinv2', 'ViTv2', if you dont have any model downloaded select one and it will be downloaded automatically in the './Models' Folder
 
 ### --general_score
 Specify the minimum 'confidence' percentage for a tag in the prediction. The lower the number, the more tags will appear, but they may be redundant or not entirely accurate to what is seen in the image.
@@ -53,7 +53,7 @@ Similar to the previous one, specify the minimum 'confidence' level for a charac
 By default it's set on 0.85
 
 ### --gpu 
-If you have an NVIDIA GPU you can use this argument to use it sice it will be much faster. Useful for large datasets
+If you have an NVIDIA GPU you can use this argument to use it sice it will be much faster. Still working on a 'batch_size' option to make thing even more faster
 
 ### --add_keyword
 If you want to use the tag format used in [MF-Bofuri](https://huggingface.co/MyneFactory/MF-Bofuri) use this. It will append the keyword at the beggining of the text. Keep in mind that to use it this way, you must have your dataset well organized by characters/artists/style so that it does not 'contaminate' other images that do not require that specific addition.
