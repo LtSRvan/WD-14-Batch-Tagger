@@ -119,6 +119,7 @@ def predict(
         .replace("(", "\(")
         .replace(")", "\)")
     )
+    a = re.sub(r'\([^]*\)', '', a)
     c = ", ".join(list(b.keys()))
     character_tags = ', '.join(list(character_res.keys())).replace('_', ' ')
     character_tags = re.sub(r'\([^)]*\)', '', character_tags)
